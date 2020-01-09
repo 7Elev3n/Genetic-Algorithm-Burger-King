@@ -22,18 +22,60 @@ Put a "gene-controlled robot" on a square grid playing field of a specific size.
 	  * 3 = West move  
 	  * 4 = Center stay  
 	  * 5 = Center eat (incurs a time penalty)  
-2. The only way to win a point is if the robot chooses to eat when it is on a food tile. 
-3. The simulator deducts points in these situations:
+2. The robot's gene is 243 digits long. It prescribes every possible scenario (3 possibilities ^ 5 tiles) that the robot can face. 
+	* A robot's field of view is limited to 5 tiles: 4 cardinal directions (North, East, South, West in order) and center. 
+	* Each tile is symbolized: *0* refers to empty, *1* refers to a tile with food, *2* refers to a tile with a wall.
+	* The simulator checks the surroundings of the robot at every turn. Say, the robot is in the below position currently. It is described to be the base 3 situation '00121' which, in base 10 numbers, refers to 16. Thus the robot will perform the 16th digit of its gene as an action.  
+	```
+	 |_|   
+	W|F|_  
+	 |F|  
+	
+	==> N:0, E:0, S:1, W:2, C:1  
+	==> 00121: base 3 int  
+	==> 16: base 10 int  
+	==> 16th digit of gene read
+	```
+3. The only way to win a point is if the robot chooses to eat when it is on a food tile. The simulator will turn that tile empty.
+4. The simulator deducts points in these situations:
 	* The robot is **against a wall** and tries to **run into it**. 
 	* The robot is on an **empty tile** and tries to **eat food**.
 	* The robot **stays at the same spot** (i.e. it chooses action 4)
-4. The simulator will not allow the robot to move into a wall. The robot will merely stay at its current location.
-5. Once a robot legally and successfully eats a piece of "food" on a tile, the simulator will turn that tile empty and the simulation will continue.
+5. The simulator will not allow the robot to move into a wall. The robot will merely stay at its current location.
+
 
 ## Framework/API
 * The API rests entirely in the file "Gamev2.py". 
-* Dependencies: *random, os, pickle, time* and *datetime*. Reasons for each are explained in the file.
-* Functions: *runGame, generate_field, play* and *print_field*.
-* **runGame** is the main function. It takes in the parameters specified [here in this README](#the-environment-and-premise) and runs the simulation using the other functions. 
+* **Dependencies**: *random, os, pickle, time* and *datetime*. Reasons for each are explained in the file.
+* **Functions**: *runGame, generate_field, play* and *print_field*.
+* **runGame** is the main function. It takes in the parameters specified [above](*the-environment-and-premise) and runs the simulation using the other functions. 
 
 ### Using the API:
+1. Command-line example "[tester.bat](tester.bat)". I use this option to see what any interesting gene is doing on the field. 
+```batch
+python -c "from Gamev2 import runGame; runGame(player='...', seed=967, toPrint=True)"
+pause
+```
+2. Used as .py module example "[evov2.py](evov2.py)". I use this option to run my evolution algorithm like a "manager" script. 
+	``` python
+	from Gamev2 import runGame
+	myscore = runGame(player=myGene, size=5, seed=5435)
+	print("My gene scored: " + myscore)
+	```
+
+***This is all you need to know if you are building your own algorithm.***
+## My evolutionary algorithm
+### Key Features are
+1. Evolution [evov2.py](evov2.py)
+	* gene-pool size
+	* mutation
+	* perc of top old genes to keep in next generation (*oldvsnew*)
+	* number of children each parent-couple can make (*percChild*)
+	* effect of 1 point difference on becoming a parent (*inequity*)
+	* crossover
+	* Dynamically varying seed based on whether the genes will be able to handle a new seed
+2. Record-keeping [evov2.py](evov2.py)
+	* JSON-creation for genes that beat a overall highscore to set a new best
+	* CSV-creation of evolution status at every *x* generations, records current-generation highscore, seed, and evolution parameters
+	* Can resume progress given the above JSON and CSV files
+3. Display progress in graphs [zzplotme.py](zzplotme.py).
