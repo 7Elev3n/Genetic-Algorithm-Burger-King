@@ -1,0 +1,7 @@
+mutations = 40
+oldvsnew = 0.05
+inequity = 10
+percChild = 0.2
+newseedfreq = 2000
+turnLim = 120
+size = 16

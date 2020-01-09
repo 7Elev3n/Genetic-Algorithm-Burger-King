@@ -1,0 +1,8 @@
+mutations = 55
+oldvsnew = 0.05
+inequity = 7
+percChild = 0.1
+newseedfreq = 0
+turnLim = 150
+size = 11
+writefreq = 30
